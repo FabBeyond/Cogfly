@@ -59,6 +59,7 @@ jobs:
               --icon ./icons/icon.icns \
               --app-version 1.0 \
               --dest "$output_dir"
+
       - name: Build macOS aarch64 dmg
         run: |
           jpackage \
