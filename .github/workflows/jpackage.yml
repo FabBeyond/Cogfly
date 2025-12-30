@@ -5,7 +5,7 @@ on:
       - master
 
 jobs:
-  build-mac:
+  package:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -37,8 +37,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build project
+        shell: bash
         run: |
-          if [ ${{ runner.os }} == 'Windows' ]; then
+          if [ "${{ runner.os }}" == "Windows" ]; then
             gradle shadowJar
           else
             ./gradlew shadowJar
