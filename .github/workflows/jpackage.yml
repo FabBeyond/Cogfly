@@ -74,30 +74,30 @@ jobs:
       - name: Build MSI
         if: runner.os == 'Windows' && matrix.arch == 'amd64'
         run: |
-          jpackage \
-            --input build/libs \
-            --main-jar cogfly-1.0.jar \
-            --name Cogfly_amd64 \
-            --type msi \
-            --vendor "Ambershadow" \
-            --icon ./icons/icon.ico \
-            --app-version 1.0 \
-            --dest output/${{ runner.os }}-${{ matrix.arch }} \
-            --win-menu \
+          jpackage `
+            --input build/libs `
+            --main-jar cogfly-1.0.jar `
+            --name Cogfly_amd64 `
+            --type msi `
+            --vendor "Ambershadow" `
+            --icon ./icons/icon.ico `
+            --app-version 1.0 `
+            --dest output/${{ runner.os }}-${{ matrix.arch }} `
+            --win-menu `
             --win-shortcut
       - name: Build EXE
         if: runner.os == 'Windows' && matrix.arch == 'amd64'
         run: |
-          jpackage \
-            --input build/libs \
-            --main-jar cogfly-1.0.jar \
-            --name Cogfly_amd64 \
-            --type exe \
-            --vendor "Ambershadow" \
-            --icon ./icons/icon.ico \
-            --app-version 1.0 \
-            --dest output/${{ runner.os }}-${{ matrix.arch }} \
-            --win-menu \
+          jpackage `
+            --input build/libs `
+            --main-jar cogfly-1.0.jar `
+            --name Cogfly_amd64 `
+            --type exe `
+            --vendor "Ambershadow" `
+            --icon ./icons/icon.ico `
+            --app-version 1.0 `
+            --dest output/${{ runner.os }}-${{ matrix.arch }} `
+            --win-menu `
             --win-shortcut
 
       - name: Build DEB
@@ -112,9 +112,10 @@ jobs:
             --icon ./icons/icon.png \
             --app-version 1.0 \
             --dest output/${{ runner.os }}-${{ matrix.arch }} \
-      - name: Build Appimage
+      - name: Build app-image folder
         if: runner.os == 'Linux' && matrix.arch == 'amd64'
         run: |
+          mkdir -p output/appimage
           jpackage \
             --input build/libs \
             --main-jar cogfly-1.0.jar \
@@ -123,7 +124,18 @@ jobs:
             --vendor "Ambershadow" \
             --icon ./icons/icon.png \
             --app-version 1.0 \
-            --dest output/${{ runner.os }}-${{ matrix.arch }} \
+            --dest output/${{ runner.os }}-${{ matrix.arch }}
+
+      #- name: Install AppImageTool
+      #  if: runner.os == 'Linux' && matrix.arch == 'amd64'
+      #  run: |
+      #    wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+      #    chmod +x appimagetool
+
+      #- name: Build final .AppImage
+      #  if: runner.os == 'Linux' && matrix.arch == 'amd64'
+      #  run: |
+      #    ./appimagetool output/appimage/Cogfly_amd64.AppDir output/Linux-amd64/Cogfly_amd64.AppImage
 
       - uses: actions/upload-artifact@v4
         with:
