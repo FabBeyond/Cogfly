@@ -32,6 +32,30 @@ javafx {
     modules("javafx.controls", "javafx.swing")
 }
 
+tasks.register("Windowsamd64") {
+    group = "build"
+    javafx.setPlatform("win")
+    finalizedBy("shadowJar")
+}
+
+tasks.register("Linuxamd64") {
+    group = "build"
+    javafx.setPlatform("linux")
+    finalizedBy("shadowJar")
+}
+
+tasks.register("macOSaarch64") {
+    group = "build"
+    javafx.setPlatform("macos-aarch64")
+    finalizedBy("shadowJar")
+}
+
+tasks.register("macOSamd64") {
+    group = "build"
+    javafx.setPlatform("macos")
+    finalizedBy("shadowJar")
+}
+
 tasks.shadowJar {
     archiveBaseName.set("cogfly")
     archiveClassifier.set("")
