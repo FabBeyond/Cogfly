@@ -32,28 +32,23 @@ javafx {
     modules("javafx.controls", "javafx.swing")
 }
 
-tasks.register("Windowsamd64") {
-    group = "build"
-    javafx.setPlatform("win")
-    finalizedBy("shadowJar")
-}
-
-tasks.register("Linuxamd64") {
-    group = "build"
-    javafx.setPlatform("linux")
-    finalizedBy("shadowJar")
-}
-
-tasks.register("macOSaarch64") {
-    group = "build"
-    javafx.setPlatform("macos-aarch64")
-    finalizedBy("shadowJar")
-}
-
-tasks.register("macOSamd64") {
-    group = "build"
-    javafx.setPlatform("macos")
-    finalizedBy("shadowJar")
+tasks.register("buildForArch"){
+    val name: String? by project
+    when (name) {
+        "Windowsamd64" -> {
+            javafx.setPlatform("win")
+        }
+        "Linuxamd64" -> {
+            javafx.setPlatform("linux")
+        }
+        "macOSaarch64" -> {
+            javafx.setPlatform("macos-aarch64")
+        }
+        "macOSamd64" -> {
+            javafx.setPlatform("macos")
+        }
+    }
+    finalizedBy(tasks.shadowJar)
 }
 
 tasks.shadowJar {
