@@ -41,7 +41,6 @@ public class Cogfly {
     public static String roamingDataPath;
     public static File dataJson;
     public static Settings settings;
-
     public static URL packUrl;
     public static String latestPackVer;
     public static URL packUrlNoConsole;
@@ -67,7 +66,7 @@ public class Cogfly {
         localDataPath = dirs.getUserDataDir("Cogfly", null, "");
         roamingDataPath = dirs.getUserDataDir("Cogfly", null, "", true);
         dataJson = new File(localDataPath + "/settings.json");
-        //noinspection ResultOfMethodCallIgnored /
+        //noinspection ResultOfMethodCallIgnored
         dataJson.getParentFile().mkdirs();
         if (!dataJson.exists()) {
             try {
@@ -89,6 +88,8 @@ public class Cogfly {
                 latestPackVer = object.get("versions").getAsJsonArray().get(0).getAsJsonObject().get("version_number").getAsString();
             }
             if (object.get("is_deprecated").getAsBoolean())
+                return;
+            if (object.get("has_nsfw_content").getAsBoolean())
                 return;
             if (excludedMods.contains(object.get("full_name").getAsString()))
                 return;

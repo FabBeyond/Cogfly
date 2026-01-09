@@ -141,3 +141,4 @@ jobs:
         with:
           name: Cogfly-${{ runner.os }}-${{ matrix.arch }}
           path: output/${{ runner.os }}-${{ matrix.arch }}/*
+          retention-days: 3

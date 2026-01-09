@@ -1,13 +1,9 @@
 package dev.ambershadow.cogfly.elements.settings;
 
-import com.google.gson.GsonBuilder;
 import dev.ambershadow.cogfly.Cogfly;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.io.Writer;
-import java.nio.file.Files;
 
 public class SettingsPanelElement extends JPanel {
 
@@ -21,6 +17,7 @@ public class SettingsPanelElement extends JPanel {
         holder.add(new ProfileSavePathPanelElement(this));
         holder.add(new ProfileSourcesPanelElement());
         holder.add(new BaseGameEnabledElement(this));
+        holder.add(new AutoNameSpacingElement(this));
 
 
         saveButton = new JButton("Save");

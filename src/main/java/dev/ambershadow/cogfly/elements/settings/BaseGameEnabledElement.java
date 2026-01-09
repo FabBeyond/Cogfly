@@ -6,9 +6,7 @@ import javax.swing.*;
 
 public class BaseGameEnabledElement extends JPanel {
 
-    private final SettingsPanelElement parent;
     public BaseGameEnabledElement(SettingsPanelElement parent) {
-        this.parent = parent;
         JLabel label = new JLabel("Allow Base Game Modding");
         JCheckBox checkBox = new JCheckBox();
         checkBox.addActionListener(_ -> {

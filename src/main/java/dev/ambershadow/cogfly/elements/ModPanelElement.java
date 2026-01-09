@@ -17,10 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModPanelElement extends JPanel {
-    private JTextField searchField;
-    private JPanel buttonsPanel;
-    private JScrollPane scrollPane;
-
+    private final JTextField searchField;
+    private final JPanel buttonsPanel;
     private Cogfly.SortingType current;
 
     public ModPanelElement() {
@@ -64,21 +62,23 @@ public class ModPanelElement extends JPanel {
                 BorderFactory.createEmptyBorder(0, 5, 0, 0)
         );
 
-        sortingOrder.addActionListener(e -> {
+        sortingOrder.addActionListener(_ -> {
             Cogfly.SortingType sortingType = Cogfly.SortingType.values()[sortingOrder.getSelectedIndex()];
             current = sortingType;
+            //noinspection DataFlowIssue
             Cogfly.sortList(sortingType, sortingDirection.getSelectedItem().toString());
             refreshButtons(Cogfly.getDisplayedMods(sortingType));
         });
 
-        sortingDirection.addActionListener(e -> {
+        sortingDirection.addActionListener(_ -> {
             Cogfly.SortingType sortingType = Cogfly.SortingType.values()[sortingOrder.getSelectedIndex()];
             current = sortingType;
+            //noinspection DataFlowIssue
             Cogfly.sortList(sortingType, sortingDirection.getSelectedItem().toString());
             refreshButtons(Cogfly.getDisplayedMods(sortingType));
         });
 
-        scrollPane = new JScrollPane(
+        JScrollPane scrollPane = new JScrollPane(
                 buttonsPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
@@ -126,9 +126,11 @@ public class ModPanelElement extends JPanel {
             JToggleButton toggleButton;
             if (mod.getName().toLowerCase().contains("bepinex"))
                 toggleButton = new JToggleButton("▼ " + mod.getName().replace("_", " "));
-            else
-                toggleButton = new JToggleButton("▼ " + mod.getName().replace("_", " ")
-                    .replaceAll("(?<=[a-z])(?=[A-Z])", " "));
+            else {
+                String name = mod.getName().replace("_", " ");
+                name = Cogfly.settings.modNameSpaces ? name.replaceAll("(?<=[a-z])(?=[A-Z])", " ") : name;
+                toggleButton = new JToggleButton("▼ " + name);
+            }
 
             toggleButton.setHorizontalAlignment(SwingConstants.LEFT);
             toggleButton.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -179,7 +181,7 @@ public class ModPanelElement extends JPanel {
             }
 
             JButton open = new JButton("Open Thunderstore Page");
-            open.addActionListener(e -> {
+            open.addActionListener(_ -> {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
                         Desktop.getDesktop().browse(mod.getPackageUrl());
@@ -189,7 +191,7 @@ public class ModPanelElement extends JPanel {
                 }
             });
             JButton openWebsite = new JButton("Open Project Website");
-            openWebsite.addActionListener(e -> {
+            openWebsite.addActionListener(_ -> {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
                         Desktop.getDesktop().browse(mod.getWebsiteUrl());
@@ -214,7 +216,7 @@ public class ModPanelElement extends JPanel {
             infoPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
             modPanel.add(infoPanel);
 
-            toggleButton.addActionListener(e -> {
+            toggleButton.addActionListener(_ -> {
                 infoPanel.setVisible(toggleButton.isSelected());
                 if (toggleButton.isSelected()) {
                     toggleButton.setText(toggleButton.getText().replace('▼', '▲'));
@@ -223,7 +225,7 @@ public class ModPanelElement extends JPanel {
                 }
             });
 
-            installButton.addActionListener(e -> {
+            installButton.addActionListener(_ -> {
                 if (mod.isInstalled() && !mod.isOutdated()) Utils.removeMod(mod);
                 else Utils.downloadMod(mod);
                 filterButtons();
