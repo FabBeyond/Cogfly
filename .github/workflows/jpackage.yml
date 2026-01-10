@@ -137,8 +137,23 @@ jobs:
           export APPIMAGE_EXTRACT_AND_RUN=1
           ./appimagetool output/appimage/Cogfly output/${{ runner.os }}-${{ matrix.arch }}/Cogfly.AppImage
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Cogfly-${{ runner.os }}-${{ matrix.arch }}
-          path: output/${{ runner.os }}-${{ matrix.arch }}/*
-          retention-days: 3
+      - name: Upload artifact to server
+        shell: bash
+        run: |
+          ARTIFACT_NAME="Cogfly-${{ runner.os }}-${{ matrix.arch }}"
+          OUTPUT_DIR="output/${{ runner.os }}-${{ matrix.arch }}"
+          ZIP_NAME="${ARTIFACT_NAME}.zip"
+
+          echo "Zipping $OUTPUT_DIR → $ZIP_NAME"
+          cd output
+          zip -r "../$ZIP_NAME" "${{ runner.os }}-${{ matrix.arch }}"
+          cd ..
+
+          echo "Uploading $ZIP_NAME"
+          curl -f -X POST https://ambershadow.net/api/cogfly/upload-artifact/ \
+            -H "Authorization: Bearer ${{ secrets.COGFLY_UPLOAD_TOKEN }}" \
+            -F "file=@$ZIP_NAME" \
+            -F "os=${{ runner.os }}" \
+            -F "arch=${{ matrix.arch }}" \
+            -F "commit=${{ github.sha }}" \
+            -F "run_id=${{ github.run_id }}"
