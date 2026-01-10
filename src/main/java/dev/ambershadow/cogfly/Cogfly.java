@@ -299,11 +299,11 @@ public class Cogfly {
             List<String> cmds = new ArrayList<>();
             Path gameAppPath = Paths.get(settings.gamePath).resolve(Utils.getGameExecutable());
             if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.MAC)) {
+                builder.directory(Paths.get(settings.gamePath).toFile());
                 cmds.add("arch");
                 cmds.add("-x86_64");
                 cmds.add("sh");
-                cmds.add(gameAppPath.toString());
-                cmds.add("Hollow Knight Silksong.app");
+                cmds.add(Utils.getGameExecutable());
             } else if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.LINUX)) {
                 builder.directory(Paths.get(settings.gamePath).toFile());
                 cmds.add("sh");
