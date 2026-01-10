@@ -149,28 +149,9 @@ jobs:
           
           echo "Uploading $ZIP_NAME"
           if [[ "$RUNNER_OS" == "Windows" ]]; then
-            powershell -Command @"
-            \$OutputDir = '${OUTPUT_DIR//\//\\}' 
-            \$ZipName = '${ZIP_NAME}'
-            Compress-Archive -Path \"\$OutputDir\*\" -DestinationPath \$ZipName -Force
-    
-            \$Headers = @{ Authorization = 'Bearer ${{ secrets.COGFLY_UPLOAD_TOKEN }}' }
-            Invoke-RestMethod -Uri 'https://ambershadow.dev/api/cogfly/upload-artifact/' 
-              -Method Post -Headers \$Headers -Form @{
-                file = Get-Item ([System.IO.Path]::Combine(\$PWD, \$ZipName))
-                os = '${{ runner.os }}'
-                arch = '${{ matrix.arch }}'
-                commit = '${{ github.sha }}'
-                run_id = '${{ github.run_id }}'
-              }
-            "@
+            powershell -Command "\$OutputDir = '${OUTPUT_DIR//\//\\}' \$ZipName = '${ZIP_NAME}' Compress-Archive -Path \"\$OutputDir\*\" -DestinationPath \$ZipName -Force"
           else
             zip -r "$ZIP_NAME" "$OUTPUT_DIR"
-            curl -X POST https://ambershadow.dev/api/cogfly/upload-artifact/ \
-              -H "Authorization: Bearer ${{ secrets.COGFLY_UPLOAD_TOKEN }}" \
-              -F "file=@$ZIP_NAME"                   
-              -F "os=${{ runner.os }}" \
-              -F "arch=${{ matrix.arch }}" \
-              -F "commit=${{ github.sha }}" \
-              -F "run_id=${{ github.run_id }}"
           fi
+          
+          dotnet ArtifactUploader.dll "$ZIP_NAME" "${{ runner.os }}" "${{ matrix.arch }}" "${{ github.sha }}" "${{ github.run_id }}" "${{ secrets.COGFLY_UPLOAD_TOKEN }}"
