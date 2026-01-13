@@ -181,25 +181,22 @@ public class Cogfly {
             JsonElement element = JsonParser.parseString(content);
             if (element != null) {
                 jsonSettingsFile = element.getAsJsonObject();
-                if (jsonSettingsFile.has("theme")) {
+                if (jsonSettingsFile.has("theme"))
                     Cogfly.settings.theme = jsonSettingsFile.get("theme").getAsString();
-                }
-
-                if (jsonSettingsFile.has("gamePath")) {
+                if (jsonSettingsFile.has("gamePath"))
                     Cogfly.settings.gamePath = jsonSettingsFile.get("gamePath").getAsString();
-                }
                 if (jsonSettingsFile.has("profileSources")){
                     List<String> profileSources = new ArrayList<>();
                     jsonSettingsFile.get("profileSources")
                             .getAsJsonArray().forEach(o -> profileSources.add(o.getAsString()));
                     Cogfly.settings.profileSources = profileSources;
                 }
-                if (jsonSettingsFile.has("baseGameEnabled")){
+                if (jsonSettingsFile.has("baseGameEnabled"))
                     settings.baseGameEnabled = jsonSettingsFile.get("baseGameEnabled").getAsBoolean();
-                }
-                if (jsonSettingsFile.has("modNameSpaces")){
+                if (jsonSettingsFile.has("modNameSpaces"))
                     settings.modNameSpaces = jsonSettingsFile.get("modNameSpaces").getAsBoolean();
-                }
+                if (jsonSettingsFile.has("scrollingIncrement"))
+                    settings.scrollingIncrement = jsonSettingsFile.get("scrollingIncrement").getAsInt();
             }
         }
         settings.save();

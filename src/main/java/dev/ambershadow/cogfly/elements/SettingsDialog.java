@@ -25,7 +25,7 @@ public class SettingsDialog extends JDialog {
     public SettingsDialog(Frame parent, String name, boolean modal) {
         super(parent, name, modal);
         resetQueue();
-        setSize(650, 275);
+        setSize(650, 300);
         setResizable(false);
         JPanel panel = new JPanel(new BorderLayout());
         JPanel holder = new JPanel();
@@ -33,6 +33,7 @@ public class SettingsDialog extends JDialog {
         holder.add(new ThemeListElement(this));
         holder.add(new GamePathElement(this));
         holder.add(new ProfileSavePathPanelElement(this));
+        holder.add(new ScrollingIncrementElement(this));
         holder.add(new BaseGameEnabledElement(this));
         holder.add(new AutoNameSpacingElement(this));
         holder.add(new ProfileSourcesPanelElement(this));
@@ -81,6 +82,7 @@ public class SettingsDialog extends JDialog {
     private String initialSavePath;
     private boolean initialAutoNameSpacing;
     private boolean initialBaseGameEnabled;
+    private int initialScrollIncrement;
 
     private String queuedTheme;
     private String queuedGamePath;
@@ -88,6 +90,7 @@ public class SettingsDialog extends JDialog {
     public String queuedProfileSavePath;
     private boolean queuedNameSpaceBool;
     private boolean queuedBaseGameBool;
+    private int queuedScrollIncrement;
     public void updateTheme(UIManager.LookAndFeelInfo theme){
         queuedTheme = theme.getClassName();
         update();
@@ -110,6 +113,11 @@ public class SettingsDialog extends JDialog {
         update();
     }
 
+    public void updateScrollIncrement(int n){
+        queuedScrollIncrement = n;
+        update();
+    }
+
     public void updateProfileSources(){
         update();
     }
@@ -121,7 +129,8 @@ public class SettingsDialog extends JDialog {
                         !Objects.equals(initialSavePath, queuedProfileSavePath) ||
                         !Objects.equals(initialProfileSources, queuedProfileSources) ||
                         initialAutoNameSpacing != queuedNameSpaceBool ||
-                        initialBaseGameEnabled != queuedBaseGameBool;
+                        initialBaseGameEnabled != queuedBaseGameBool ||
+                        initialScrollIncrement != queuedScrollIncrement;
 
         saveButton.setEnabled(dirty);
     }
@@ -147,6 +156,7 @@ public class SettingsDialog extends JDialog {
         Cogfly.settings.profileSavePath = queuedProfileSavePath;
         Cogfly.settings.gamePath = queuedGamePath;
         Cogfly.settings.theme = queuedTheme;
+        Cogfly.settings.scrollingIncrement = queuedScrollIncrement;
 
         if (!queuedProfileSources.equals(initialProfileSources))
             ProfileManager.loadProfiles();
@@ -164,11 +174,13 @@ public class SettingsDialog extends JDialog {
         queuedProfileSavePath = Cogfly.settings.profileSavePath;
         queuedGamePath = Cogfly.settings.gamePath;
         queuedTheme = Cogfly.settings.theme;
+        queuedScrollIncrement = Cogfly.settings.scrollingIncrement;
         initialProfileSources = new ArrayList<>(Cogfly.settings.profileSources);
         initialAutoNameSpacing = Cogfly.settings.modNameSpaces;
         initialBaseGameEnabled = Cogfly.settings.baseGameEnabled;
         initialSavePath = Cogfly.settings.profileSavePath;
         initialGamePath = Cogfly.settings.gamePath;
         initialTheme = Cogfly.settings.theme;
+        initialScrollIncrement = Cogfly.settings.scrollingIncrement;
     }
 }

@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProfilesScreenElement extends JPanel implements ReloadablePage {
 
-    public JPanel parentPanel;
-
+    private final JPanel parentPanel;
+    private final JScrollPane pane;
     public ProfilesScreenElement() {
         JPanel upperPanel = new JPanel();
         upperPanel.setPreferredSize(new Dimension(getWidth(), 30));
@@ -93,8 +93,9 @@ public class ProfilesScreenElement extends JPanel implements ReloadablePage {
         JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
         wrapper.add(parentPanel);
 
-        JScrollPane pane = new JScrollPane(wrapper, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+        pane = new JScrollPane(wrapper, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
 
         JButton createProfile = new JButton("Create Profile");
         createProfile.addActionListener(_ -> {
@@ -177,6 +178,7 @@ public class ProfilesScreenElement extends JPanel implements ReloadablePage {
 
     @Override
     public void reload() {
+        pane.getVerticalScrollBar().setUnitIncrement(Cogfly.settings.scrollingIncrement);
         drawProfiles();
     }
 }

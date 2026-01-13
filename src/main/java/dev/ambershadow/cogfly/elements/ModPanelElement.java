@@ -31,6 +31,7 @@ public class ModPanelElement extends JPanel {
     private final JTextField searchField;
     private final JPanel buttonsPanel;
     private Cogfly.SortingType current;
+    private final JScrollPane scrollPane;
 
 
     public ModPanelElement(Profile profile) {
@@ -92,7 +93,7 @@ public class ModPanelElement extends JPanel {
             redrawPanel();
         });
 
-        JScrollPane scrollPane = new JScrollPane(
+        scrollPane = new JScrollPane(
                 buttonsPanel,
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
@@ -265,6 +266,7 @@ public class ModPanelElement extends JPanel {
     }
 
     private void redrawPanel(){
+        scrollPane.getVerticalScrollBar().setUnitIncrement(Cogfly.settings.scrollingIncrement);
         String query = searchField.getText();
         if (query.isEmpty())
             refreshButtons(Cogfly.getDisplayedMods(current, profile));

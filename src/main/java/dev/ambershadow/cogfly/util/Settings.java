@@ -33,7 +33,7 @@ public class Settings {
     public List<String> profileSources = new ArrayList<>();
     public boolean baseGameEnabled = false;
     public boolean modNameSpaces = true;
-
+    public int scrollingIncrement = 16;
 
     private String findDefaultPath(){
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
