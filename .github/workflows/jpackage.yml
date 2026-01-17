@@ -137,13 +137,9 @@ jobs:
           export APPIMAGE_EXTRACT_AND_RUN=1
           ./appimagetool output/appimage/Cogfly output/${{ runner.os }}-${{ matrix.arch }}/Cogfly.AppImage
 
-      - name: Upload artifact to server
-        shell: bash
-        run: |
-          ARTIFACT_NAME="Cogfly-${{ runner.os }}-${{ matrix.arch }}"
-          OUTPUT_DIR="output/${{ runner.os }}-${{ matrix.arch }}"
-          ZIP_NAME="${ARTIFACT_NAME}.zip"
-
-          echo "Zipping $OUTPUT_DIR → $ZIP_NAME"
-          dotnet Unzipper/Unzipper.dll "$OUTPUT_DIR" "$ZIP_NAME"
-          dotnet ArtifactUploader/ArtifactUploader.dll "$ZIP_NAME" "${{ runner.os }}" "${{ matrix.arch }}" "${{ github.sha }}" "${{ github.run_id }}" "${{ secrets.COGFLY_UPLOAD_TOKEN }}"
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cogfly-${{ runner.os }}-${{ matrix.arch }}
+          path: output/${{ runner.os }}-${{ matrix.arch }}
+          retention-days: 14
