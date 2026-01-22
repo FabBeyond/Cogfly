@@ -25,7 +25,7 @@ public class SettingsDialog extends JDialog {
     public SettingsDialog(Frame parent, String name, boolean modal) {
         super(parent, name, modal);
         resetQueue();
-        setSize(650, 300);
+        setSize(650, 320);
         setResizable(false);
         JPanel panel = new JPanel(new BorderLayout());
         JPanel holder = new JPanel();
