@@ -44,7 +44,7 @@ public class Settings {
 
     public JsonObject jsonSettingsFile;
 
-    private final File dataJson;
+    private final transient File dataJson;
     public Settings(File data){
         dataJson = data;
     }
