@@ -45,7 +45,7 @@ public class Cogfly {
 
     public static WinFolderPicker FOLDER_PICKER;
     public static WinTinyFileDialogs FILE_DIALOGS;
-    public static void main(String[] ignored) {
+    public static void main(String[] args) {
         AppDirs dirs = AppDirsFactory.getInstance();
         localDataPath = dirs.getUserDataDir("Cogfly", null, "");
         roamingDataPath = dirs.getUserDataDir("Cogfly", null, "", true);
