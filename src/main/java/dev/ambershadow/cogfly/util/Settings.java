@@ -1,18 +1,23 @@
 package dev.ambershadow.cogfly.util;
 
+import com.formdev.flatlaf.intellijthemes.FlatAllIJThemes;
 import com.formdev.flatlaf.intellijthemes.FlatNordIJTheme;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.ambershadow.cogfly.Cogfly;
 import net.harawata.appdirs.AppDirsFactory;
 
-import java.io.IOException;
-import java.io.Writer;
+import javax.swing.*;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Settings {
 
@@ -24,7 +29,7 @@ public class Settings {
             "Program Files/GOG Galaxy/Games/Hollow Knight Silksong",
             "Program Files (x86)/GOG Galaxy/Games/Hollow Knight Silksong",
             "Steam/steamapps/common/Hollow Knight Silksong",
-            "GOG Galaxy/Games/Hollow Knight Silksong"
+            "GOG Galaxy/Games/Hollow Knight Silksong",
     };
 
     public String theme = FlatNordIJTheme.class.getName();
@@ -35,6 +40,14 @@ public class Settings {
     public boolean modNameSpaces = true;
     public int scrollingIncrement = 16;
     public boolean useRelativeTime = false;
+
+
+    public JsonObject jsonSettingsFile;
+
+    private final File dataJson;
+    public Settings(File data){
+        dataJson = data;
+    }
 
     private String findDefaultPath(){
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
@@ -59,7 +72,7 @@ public class Settings {
     }
 
     public void save(){
-        try (Writer writer = Files.newBufferedWriter(Cogfly.dataJson.toPath())) {
+        try (Writer writer = Files.newBufferedWriter(dataJson.toPath())) {
             new GsonBuilder().setPrettyPrinting().create()
                     .toJson(this, writer);
         } catch (IOException ex) {
@@ -67,5 +80,50 @@ public class Settings {
         }
         if (FrameManager.isCreated)
             FrameManager.getOrCreate().getCurrentPage().reload();
+    }
+
+
+    public void load(){
+        String content;
+        try(FileReader reader = new FileReader(dataJson)) {
+            content = new BufferedReader(reader).lines().collect(Collectors.joining("\n"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (!content.isEmpty()) {
+            JsonElement element = JsonParser.parseString(content);
+            if (element != null) {
+                jsonSettingsFile = element.getAsJsonObject();
+                if (jsonSettingsFile.has("theme"))
+                    theme = jsonSettingsFile.get("theme").getAsString();
+                if (jsonSettingsFile.has("gamePath"))
+                    gamePath = jsonSettingsFile.get("gamePath").getAsString();
+                if (jsonSettingsFile.has("profileSources")){
+                    List<String> src = new ArrayList<>();
+                    jsonSettingsFile.get("profileSources")
+                            .getAsJsonArray().forEach(o -> src.add(o.getAsString()));
+                    profileSources = src;
+                }
+                if (jsonSettingsFile.has("baseGameEnabled"))
+                    baseGameEnabled = jsonSettingsFile.get("baseGameEnabled").getAsBoolean();
+                if (jsonSettingsFile.has("modNameSpaces"))
+                    modNameSpaces = jsonSettingsFile.get("modNameSpaces").getAsBoolean();
+                if (jsonSettingsFile.has("scrollingIncrement"))
+                    scrollingIncrement = jsonSettingsFile.get("scrollingIncrement").getAsInt();
+                if (jsonSettingsFile.has("useRelativeTime"))
+                    useRelativeTime = jsonSettingsFile.get("useRelativeTime").getAsBoolean();
+            }
+        }
+        save();
+
+        for (FlatAllIJThemes.FlatIJLookAndFeelInfo info : FlatAllIJThemes.INFOS) {
+            if (info.getClassName().equals(Cogfly.settings.theme)) {
+                try {
+                    UIManager.setLookAndFeel(info.getClassName());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 }

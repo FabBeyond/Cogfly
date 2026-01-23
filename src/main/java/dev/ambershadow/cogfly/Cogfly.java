@@ -1,9 +1,6 @@
 package dev.ambershadow.cogfly;
 
-import com.formdev.flatlaf.intellijthemes.FlatAllIJThemes;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.sun.jna.Native;
 import dev.ambershadow.cogfly.loader.ModData;
 import dev.ambershadow.cogfly.loader.ModFetcher;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 public class Cogfly {
 
@@ -49,7 +45,7 @@ public class Cogfly {
 
     public static WinFolderPicker FOLDER_PICKER;
     public static WinTinyFileDialogs FILE_DIALOGS;
-    static void main() {
+    public static void main(String[] ignored) {
         AppDirs dirs = AppDirsFactory.getInstance();
         localDataPath = dirs.getUserDataDir("Cogfly", null, "");
         roamingDataPath = dirs.getUserDataDir("Cogfly", null, "", true);
@@ -86,7 +82,8 @@ public class Cogfly {
                 throw new RuntimeException(e);
             }
         }
-        loadSettings();
+        settings = new Settings(dataJson);
+        settings.load();
         packUrl = Cogfly.getResource("/packs/BepInExPack.zip");
         packUrlNoConsole = Cogfly.getResource("/packs/BepInExPack_NoConsole.zip");
         logger.info("Loaded settings");
@@ -125,6 +122,8 @@ public class Cogfly {
     public static void downloadBepInExNoConsole(Path path){
         Path bepindll = path.resolve("BepInEx/core/BepInEx.dll");
         if (bepindll.toFile().exists())
+            return;
+        if (!path.toFile().exists())
             return;
         Utils.downloadAndExtract(packUrlNoConsole, path);
     }
@@ -167,55 +166,9 @@ public class Cogfly {
         return mods;
     }
 
-    public static JsonObject jsonSettingsFile;
-
-    private static void loadSettings() {
-        String content;
-        try(FileReader reader = new FileReader(dataJson)) {
-            content = new BufferedReader(reader).lines().collect(Collectors.joining("\n"));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        settings = new Settings();
-        if (!content.isEmpty()) {
-            JsonElement element = JsonParser.parseString(content);
-            if (element != null) {
-                jsonSettingsFile = element.getAsJsonObject();
-                if (jsonSettingsFile.has("theme"))
-                    Cogfly.settings.theme = jsonSettingsFile.get("theme").getAsString();
-                if (jsonSettingsFile.has("gamePath"))
-                    Cogfly.settings.gamePath = jsonSettingsFile.get("gamePath").getAsString();
-                if (jsonSettingsFile.has("profileSources")){
-                    List<String> profileSources = new ArrayList<>();
-                    jsonSettingsFile.get("profileSources")
-                            .getAsJsonArray().forEach(o -> profileSources.add(o.getAsString()));
-                    Cogfly.settings.profileSources = profileSources;
-                }
-                if (jsonSettingsFile.has("baseGameEnabled"))
-                    settings.baseGameEnabled = jsonSettingsFile.get("baseGameEnabled").getAsBoolean();
-                if (jsonSettingsFile.has("modNameSpaces"))
-                    settings.modNameSpaces = jsonSettingsFile.get("modNameSpaces").getAsBoolean();
-                if (jsonSettingsFile.has("scrollingIncrement"))
-                    settings.scrollingIncrement = jsonSettingsFile.get("scrollingIncrement").getAsInt();
-                if (jsonSettingsFile.has("useRelativeTime"))
-                    settings.useRelativeTime = jsonSettingsFile.get("useRelativeTime").getAsBoolean();
-            }
-        }
-        settings.save();
-
-        for (FlatAllIJThemes.FlatIJLookAndFeelInfo info : FlatAllIJThemes.INFOS) {
-            if (info.getClassName().equals(Cogfly.settings.theme)) {
-                try {
-                    UIManager.setLookAndFeel(info.getClassName());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-    }
     private static void showEarlyDialogs(){
-        if (jsonSettingsFile != null && jsonSettingsFile.has("profileSavePath")) {
-            Cogfly.settings.profileSavePath = jsonSettingsFile.get("profileSavePath").getAsString();
+        if (settings.jsonSettingsFile != null && settings.jsonSettingsFile.has("profileSavePath")) {
+            Cogfly.settings.profileSavePath = settings.jsonSettingsFile.get("profileSavePath").getAsString();
         } else {
             logger.info("No stored profile save path! Prompting:");
             JDialog prompt = new JDialog(FrameManager.getOrCreate().frame, "Profile Save Path", true);
