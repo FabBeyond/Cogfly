@@ -1,17 +1,24 @@
 package dev.ambershadow.cogfly.util;
 
+import com.google.gson.stream.JsonWriter;
+import dev.ambershadow.cogfly.Cogfly;
 import dev.ambershadow.cogfly.loader.ModData;
 
 import javax.swing.*;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public class Profile {
     List<ModData> installedMods = new ArrayList<>();
     private final Path path;
     private final String name;
 
+    private String gamePath = Cogfly.settings.gamePath;
     private Icon icon;
     public Profile(String name, Path path) {
         this(name, path, null);
@@ -54,6 +61,34 @@ public class Profile {
     }
     public void setIcon(Icon icon) {
         this.icon = icon;
+    }
+    public String getGamePath(){
+        return Cogfly.settings.profileSpecificPaths ? gamePath : Cogfly.settings.gamePath;
+    }
+
+    public void resetGamePath(){
+        try {
+            Files.deleteIfExists(getPath().resolve("cogfly_data.json"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        gamePath = Cogfly.settings.gamePath;
+    }
+
+    public void setGamePathWithoutSaving(String gamePath){
+        this.gamePath = gamePath;
+        CompletableFuture.runAsync(() -> Cogfly.downloadBepInExNoConsole(Paths.get(gamePath)));
+    }
+    public void setGamePath(String gamePath){
+        setGamePathWithoutSaving(gamePath);
+        try(JsonWriter writer = new JsonWriter(Files.newBufferedWriter(getPath().resolve("cogfly_data.json")))) {
+            writer.beginObject();
+            writer.name("gamePath");
+            writer.value(gamePath);
+            writer.endObject();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getName() {

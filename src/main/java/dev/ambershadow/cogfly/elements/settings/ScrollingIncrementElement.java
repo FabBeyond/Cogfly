@@ -6,7 +6,7 @@ import dev.ambershadow.cogfly.elements.SettingsDialog;
 import javax.swing.*;
 import java.awt.*;
 
-public class ScrollingIncrementElement extends JPanel {
+public class ScrollingIncrementElement extends SettingsElement {
     public ScrollingIncrementElement(SettingsDialog parent) {
         JLabel label = new JLabel("Scrolling Increment");
         JComboBox<Integer> box = new JComboBox<>();
@@ -22,18 +22,6 @@ public class ScrollingIncrementElement extends JPanel {
             parent.updateScrollIncrement(n);
         });
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(5, 10, 5, 10);
-        add(label, c);
-        c.gridx = 1;
-        c.weightx = 1;
-        c.anchor = GridBagConstraints.EAST;
-        c.fill = GridBagConstraints.NONE;
-        add(box, c);
+        add(label, box);
     }
 }

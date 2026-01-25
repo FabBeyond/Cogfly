@@ -11,7 +11,6 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
@@ -76,25 +75,12 @@ public class Utils {
             String[] files =  file.list();
             if (files == null || files.length == 0)
                 return;
-            URI open = savePath.resolve(files[0]).toUri();
-            if (!(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
-                return;
-            try {
-                Desktop.getDesktop().browse(open);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+           openPath(savePath.resolve(files[0]));
         }
     }
 
     public static void openProfilePath(Profile profile) {
-        if (!(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
-            return;
-        try {
-            Desktop.getDesktop().browse(profile.getPath().toUri());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        openPath(profile.getPath());
     }
 
     public static void pickFolder(Consumer<Path> callback){
@@ -436,7 +422,7 @@ public class Utils {
     }
     public static void launchModdedGame(Profile profile){
         Cogfly.logger.info("Attempting to launch game with profile: {}",  profile.getName());
-        Cogfly.launchGameAsync(true, profile.getBepInExPath().toString());
+        Cogfly.launchGameAsync(true, profile.getBepInExPath().toString(), profile.getGamePath());
     }
 
     private static void deleteFolder(Path folder){

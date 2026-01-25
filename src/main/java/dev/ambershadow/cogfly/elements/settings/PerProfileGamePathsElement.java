@@ -4,18 +4,17 @@ import dev.ambershadow.cogfly.Cogfly;
 import dev.ambershadow.cogfly.elements.SettingsDialog;
 
 import javax.swing.*;
-import java.awt.*;
 
-public class BaseGameEnabledElement extends SettingsElement {
+public class PerProfileGamePathsElement extends SettingsElement {
 
-    public BaseGameEnabledElement(SettingsDialog parent) {
-        JLabel label = new JLabel("Allow Base Game Modding");
+    public PerProfileGamePathsElement(SettingsDialog parent) {
+        JLabel label = new JLabel("Allow Per-Profile Game Paths");
         JCheckBox checkBox = new JCheckBox();
         checkBox.addActionListener(_ -> {
             boolean enabled = checkBox.isSelected();
-            parent.updateBaseGameModding(enabled);
+            parent.updatePerProfilePaths(enabled);
         });
-        checkBox.setSelected(Cogfly.settings.baseGameEnabled);
+        checkBox.setSelected(Cogfly.settings.profileSpecificPaths);
         add(label, checkBox);
     }
 }

@@ -248,7 +248,7 @@ public class Cogfly {
             path.addActionListener(_ -> Utils.pickFile((file) -> {
                 path.setText(file.toFile().getParentFile().getAbsolutePath());
                 confirm.setEnabled(true);
-            }, "Hollow Knight Silksong", "exe", "app", "x86_64"));
+            }, "Hollow Knight Silksong", "exe", "app", ""));
             JPanel confirmPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
             confirmPanel.add(confirm);
             prompt.add(confirmPanel, BorderLayout.SOUTH);
@@ -259,20 +259,21 @@ public class Cogfly {
     }
 
 
-    public static void launchGameAsync(boolean enabled, String path){
+    public static void launchGameAsync(boolean enabled, String path, String gamePath){
         CompletableFuture.runAsync(() -> {
             logger.info("Launching game. OS: {}, Path: {}", Utils.OperatingSystem.current(), path);
             ProcessBuilder builder = new ProcessBuilder();
             List<String> cmds = new ArrayList<>();
-            Path gameAppPath = Paths.get(settings.gamePath).resolve(Utils.getGameExecutable());
+            Path game = Paths.get(gamePath);
+            Path gameAppPath = game.resolve(Utils.getGameExecutable());
             if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.MAC)) {
-                builder.directory(Paths.get(settings.gamePath).toFile());
+                builder.directory(game.toFile());
                 cmds.add("arch");
                 cmds.add("-x86_64");
                 cmds.add("sh");
                 cmds.add(Utils.getGameExecutable());
             } else if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.LINUX)) {
-                builder.directory(Paths.get(settings.gamePath).toFile());
+                builder.directory(game.toFile());
                 cmds.add("setsid");
                 cmds.add("sh");
                 cmds.add(Utils.getGameExecutable());

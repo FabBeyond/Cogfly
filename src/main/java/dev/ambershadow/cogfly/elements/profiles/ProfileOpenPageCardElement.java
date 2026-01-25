@@ -18,6 +18,7 @@ public class ProfileOpenPageCardElement extends JPanel {
     private final Profile profile;
     private final JButton updateAll;
     private final JButton remove;
+    private final JButton setPath;
     public ProfileOpenPageCardElement(Profile profile) {
         super(new BorderLayout());
         this.profile = profile;
@@ -151,6 +152,41 @@ public class ProfileOpenPageCardElement extends JPanel {
             prompt.setVisible(true);
         });
 
+        setPath = new JButton("Set Per-Profile Game Path");
+        setPath.addActionListener(_ -> {
+            JDialog prompt = new JDialog(FrameManager.getOrCreate().frame);
+            prompt.setModal(true);
+            prompt.setSize(new Dimension(500, 125));
+            prompt.setResizable(false);
+            prompt.setLocationRelativeTo(null);
+            prompt.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            JPanel content = new JPanel();
+            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+            prompt.setContentPane(content);
+            JLabel current = new JLabel(profile.getGamePath());
+            JButton customPathButton = new JButton("Select Game Path");
+            JButton resetPathButton = new JButton("Reset Path");
+
+            customPathButton.addActionListener(_ -> Utils.pickFile((path) -> {
+                profile.setGamePath(path.toFile().getParentFile().getAbsolutePath());
+                prompt.dispose();
+            }, "Hollow Knight Silksong", "exe", "app", ""));
+            resetPathButton.addActionListener(_ -> {
+                profile.resetGamePath();
+                prompt.dispose();
+            });
+
+            customPathButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            resetPathButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            current.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            content.add(current);
+            content.add(Box.createVerticalStrut(5));
+            content.add(customPathButton);
+            content.add(Box.createVerticalStrut(5));
+            content.add(resetPathButton);
+            prompt.setVisible(true);
+        });
 
         upperPanel.add(launch);
         upperPanel.add(updateAll);
@@ -159,6 +195,7 @@ public class ProfileOpenPageCardElement extends JPanel {
         upperPanel.add(exportAsFile);
         upperPanel.add(openFileLocation);
         upperPanel.add(changeProfileIcon);
+        upperPanel.add(setPath);
         upperPanel.add(remove);
         add(upperPanel, BorderLayout.NORTH);
         add(new ModPanelElement(profile), BorderLayout.CENTER);
@@ -172,5 +209,6 @@ public class ProfileOpenPageCardElement extends JPanel {
         if (profile.getPath().equals(Paths.get(Cogfly.settings.gamePath))){
             remove.setEnabled(false);
         }
+        setPath.setVisible(Cogfly.settings.profileSpecificPaths);
     }
 }

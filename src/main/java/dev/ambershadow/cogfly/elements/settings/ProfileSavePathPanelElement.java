@@ -7,7 +7,7 @@ import dev.ambershadow.cogfly.util.Utils;
 import javax.swing.*;
 import java.awt.*;
 
-public class ProfileSavePathPanelElement extends JPanel {
+public class ProfileSavePathPanelElement extends SettingsElement {
 
     public ProfileSavePathPanelElement(SettingsDialog parent) {
         JLabel label = new JLabel("Profile Save Path ");
@@ -19,18 +19,6 @@ public class ProfileSavePathPanelElement extends JPanel {
             parent.updateProfileSavePath(p);
         }));
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(5, 10, 5, 10);
-        add(label, c);
-        c.gridx = 1;
-        c.weightx = 1;
-        c.anchor = GridBagConstraints.EAST;
-        c.fill = GridBagConstraints.NONE;
-        add(button, c);
+        add(label, button);
     }
 }

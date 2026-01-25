@@ -40,6 +40,7 @@ public class Settings {
     public boolean modNameSpaces = true;
     public int scrollingIncrement = 16;
     public boolean useRelativeTime = false;
+    public boolean profileSpecificPaths = false;
 
 
     private final transient File dataJson;

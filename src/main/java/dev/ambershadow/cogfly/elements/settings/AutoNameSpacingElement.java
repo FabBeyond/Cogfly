@@ -6,7 +6,7 @@ import dev.ambershadow.cogfly.elements.SettingsDialog;
 import javax.swing.*;
 import java.awt.*;
 
-public class AutoNameSpacingElement extends JPanel {
+public class AutoNameSpacingElement extends SettingsElement {
 
     public AutoNameSpacingElement(SettingsDialog parent) {
         JLabel label = new JLabel("Add Spaces To Mod Names");
@@ -16,18 +16,6 @@ public class AutoNameSpacingElement extends JPanel {
             parent.updateModNameSpacing(enabled);
         });
         checkBox.setSelected(Cogfly.settings.modNameSpaces);
-        setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(5, 10, 5, 10);
-        add(label, c);
-        c.gridx = 1;
-        c.weightx = 1;
-        c.anchor = GridBagConstraints.EAST;
-        c.fill = GridBagConstraints.NONE;
-        add(checkBox, c);
+        add(label, checkBox);
     }
 }

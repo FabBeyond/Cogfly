@@ -7,7 +7,7 @@ import dev.ambershadow.cogfly.util.Utils;
 import javax.swing.*;
 import java.awt.*;
 
-public class GamePathElement extends JPanel {
+public class GamePathElement extends SettingsElement {
     public GamePathElement(SettingsDialog parent){
 
         JLabel label = new JLabel("Game Path ");
@@ -18,20 +18,8 @@ public class GamePathElement extends JPanel {
                     .getParentFile().getAbsolutePath();
             button.setText(p);
             parent.updateGamePath(p);
-        }, "Hollow Knight Silksong", "exe", "app"));
+        }, "Hollow Knight Silksong", "exe", "app", ""));
 
-        setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 0;
-        c.anchor = GridBagConstraints.WEST;
-        c.insets = new Insets(5, 10, 5, 10);
-        add(label, c);
-        c.gridx = 1;
-        c.weightx = 1;
-        c.anchor = GridBagConstraints.EAST;
-        c.fill = GridBagConstraints.NONE;
-        add(button, c);
+        add(label, button);
     }
 }

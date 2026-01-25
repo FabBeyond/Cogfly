@@ -2,6 +2,7 @@ package dev.ambershadow.cogfly.util;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import dev.ambershadow.cogfly.Cogfly;
 import dev.ambershadow.cogfly.asset.Assets;
 import dev.ambershadow.cogfly.loader.ModData;
@@ -112,7 +113,6 @@ public class ProfileManager {
         List<String> paths = new ArrayList<>(Cogfly.settings.profileSources);
         paths.add(Cogfly.settings.profileSavePath);
         for (String m : paths) {
-            System.out.println("Path: " + m);
             Path path = Paths.get(m);
             if (!path.toFile().exists())
                 continue;
@@ -125,13 +125,29 @@ public class ProfileManager {
                 String[] extensions = {"png", "jpeg", "jpg", "gif"};
                 ImageIcon icon = null;
                 for (String extension : extensions) {
-                    Path path2 = Paths.get(file.getPath() + "/icon." + extension);
+                    Path path2 = file.toPath().resolve("icon." + extension);
                     if (path2.toFile().exists()){
                         icon = new ImageIcon(path2.toString());
                         break;
                     }
                 }
+                Path data = file.toPath().resolve("cogfly_data.json");
+                String gamePath = "";
+                if (data.toFile().exists()){
+                    try(JsonReader reader = new JsonReader(Files.newBufferedReader(data))) {
+                        reader.beginObject();
+                        if (reader.nextName().equals("gamePath")) {
+                            gamePath = reader.nextString();
+                        }
+                        reader.endObject();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 Profile profile = new Profile(file.getName(), Paths.get(file.getAbsolutePath()), icon);
+                if (!gamePath.isEmpty())
+                    profile.setGamePath(Paths.get(gamePath).toString());
+                Cogfly.logger.info("Read path {} for profile {}.", gamePath, profile.getName());
                 profile.installedMods = ModFetcher.getInstalledMods(profile.getPluginsPath());
                 profiles.add(profile);
             }
