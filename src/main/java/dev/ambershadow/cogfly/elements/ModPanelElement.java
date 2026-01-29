@@ -9,7 +9,6 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -212,27 +211,11 @@ public class ModPanelElement extends JPanel {
             }
 
             JButton open = new JButton("Open Thunderstore Page");
-            open.addActionListener(_ -> {
-                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        Desktop.getDesktop().browse(mod.getPackageUrl());
-                    } catch (IOException a) {
-                        throw new RuntimeException(a);
-                    }
-                }
-            });
+            open.addActionListener(_ -> Utils.openURI(mod.getPackageUrl()));
             JButton openWebsite = new JButton("Open Project Website");
             if (mod.getWebsiteUrl() != null)
                 openWebsite.setToolTipText(mod.getWebsiteUrl().toString());
-            openWebsite.addActionListener(_ -> {
-                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        Desktop.getDesktop().browse(mod.getWebsiteUrl());
-                    } catch (IOException a) {
-                        throw new RuntimeException(a);
-                    }
-                }
-            });
+            openWebsite.addActionListener(_ -> Utils.openURI(mod.getWebsiteUrl()));
 
             Box buttonBox = Box.createHorizontalBox();
             buttonBox.add(open);

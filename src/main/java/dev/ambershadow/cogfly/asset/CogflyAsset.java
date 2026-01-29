@@ -14,6 +14,13 @@ public record CogflyAsset(URL url) {
         return new ImageIcon(url);
     }
 
+    public Icon getAsScaledIcon(int width, int height){
+        ImageIcon icon = new ImageIcon(url);
+        Image scaled = icon.getImage().getScaledInstance(
+                width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(scaled);
+    }
+
     public Icon getAsIconWithColor(Color color){
         Icon icon = getAsIcon();
         int w = icon.getIconWidth();

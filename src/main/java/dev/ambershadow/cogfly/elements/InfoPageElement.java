@@ -2,24 +2,54 @@ package dev.ambershadow.cogfly.elements;
 
 import dev.ambershadow.cogfly.Cogfly;
 import dev.ambershadow.cogfly.asset.Assets;
+import dev.ambershadow.cogfly.elements.profiles.ProfileCardElement;
+import dev.ambershadow.cogfly.util.HoverLerp;
 import dev.ambershadow.cogfly.util.Utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.URI;
 import java.nio.file.Paths;
 
 public class InfoPageElement extends JPanel {
+
     public InfoPageElement() {
         setLayout(new BorderLayout());
 
-        JLabel image = new JLabel();
-        ImageIcon icon = (ImageIcon)Assets.centralIcon.getAsIcon();
-        Image scaled = icon.getImage().getScaledInstance(
-                549, 336, Image.SCALE_SMOOTH);
-        image.setIcon(new ImageIcon(scaled));
+        JLabel image = new JLabel(Assets.centralIcon.getAsScaledIcon(549, 336));
         image.setHorizontalAlignment(SwingConstants.CENTER);
         add(image, BorderLayout.NORTH);
         add(createButtons(), BorderLayout.CENTER);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("Links");
+        label.setFont(new Font("Arial", Font.BOLD, 24));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        panel.add(label, BorderLayout.NORTH);
+        panel.add(createLinks(), BorderLayout.SOUTH);
+        add(panel, BorderLayout.SOUTH);
+    }
+
+    public JScrollPane createLinks(){
+        Dimension size = new Dimension(175, 150);
+        JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JButton github = new JButton(Assets.github.getAsScaledIcon(147, 144));
+        github.setPreferredSize(size);
+        github.setToolTipText("https://github.com/nix-main/Cogfly");
+        github.addActionListener(_ -> Utils.openURI(URI.create("https://github.com/nix-main/Cogfly")));
+        HoverLerp.install(github, () -> ProfileCardElement.normal, () -> ProfileCardElement.hover);
+        panel.add(github);
+
+        JButton discord = new JButton(Assets.discord.getAsScaledIcon(132, 100));
+        discord.setPreferredSize(size);
+        discord.setToolTipText("https://discord.gg/VDsg3HmWuB");
+        discord.addActionListener(_ -> Utils.openURI(URI.create("https://discord.gg/VDsg3HmWuB")));
+        HoverLerp.install(discord, () -> ProfileCardElement.normal, () -> ProfileCardElement.hover);
+        panel.add(discord);
+
+        return new JScrollPane(panel, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
     }
 
     public JPanel createButtons(){
@@ -58,7 +88,7 @@ public class InfoPageElement extends JPanel {
         buttons.add(logsButton);
 
         buttons.setBorder(
-                BorderFactory.createEmptyBorder(0, 300, 200, 300)
+                BorderFactory.createEmptyBorder(0, 300, 0, 300)
         );
 
         return buttons;

@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
@@ -56,10 +57,14 @@ public class Utils {
 
 
     public static void openPath(Path path){
+        openURI(path.toUri());
+    }
+
+    public static void openURI(URI uri){
         if (!(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)))
             return;
         try {
-            Desktop.getDesktop().browse(path.toUri());
+            Desktop.getDesktop().browse(uri);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
