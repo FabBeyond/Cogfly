@@ -291,6 +291,23 @@ public class Cogfly {
             }
             builder.command(cmds);
             logger.info("Launch command: {}", cmds);
+            if (settings.launchWithSteam) {
+                logger.info("Launching with Steam Client");
+                if (Files.exists(game.resolve("steam_appid.txt")))
+                    try {
+                        Files.delete(game.resolve("steam_appid.txt"));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+            } else {
+                logger.info("Launching standalone");
+                if (!Files.exists(game.resolve("steam_appid.txt")))
+                    try {
+                        Files.writeString(game.resolve("steam_appid.txt"), "1030300");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+            }
             try {
                 builder.start();
             } catch (IOException e) {

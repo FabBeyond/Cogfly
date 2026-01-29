@@ -37,6 +37,7 @@ public class SettingsDialog extends JDialog {
         holder.add(new AutoNameSpacingElement(this));
         holder.add(new UseRelativeTimeElement(this));
         holder.add(new PerProfileGamePathsElement(this));
+        holder.add(new LaunchWithSteamElement(this));
         holder.add(new ProfileSourcesPanelElement(this));
 
         saveButton = new JButton("Apply & Save");
@@ -90,6 +91,7 @@ public class SettingsDialog extends JDialog {
     private int initialScrollIncrement;
     private boolean initialRelativeTime;
     private boolean initialPerProfilePaths;
+    private boolean initialLaunchWithSteam;
     private String queuedTheme;
     private String queuedGamePath;
     public List<String> queuedProfileSources;
@@ -99,6 +101,7 @@ public class SettingsDialog extends JDialog {
     private int queuedScrollIncrement;
     private boolean queuedRelativeTime;
     private boolean queuedPerProfilePaths;
+    private boolean queuedLaunchWithSteam;
 
     public void updateTheme(UIManager.LookAndFeelInfo theme){
         queuedTheme = theme.getClassName();
@@ -137,6 +140,11 @@ public class SettingsDialog extends JDialog {
         update();
     }
 
+    public void updateLaunchWithSteam(boolean n){
+        queuedLaunchWithSteam = n;
+        update();
+    }
+
     public void updateProfileSources(){
         update();
     }
@@ -151,7 +159,8 @@ public class SettingsDialog extends JDialog {
                         initialBaseGameEnabled != queuedBaseGameBool ||
                         initialScrollIncrement != queuedScrollIncrement ||
                         initialRelativeTime != queuedRelativeTime ||
-                        initialPerProfilePaths != queuedPerProfilePaths;
+                        initialPerProfilePaths != queuedPerProfilePaths ||
+                        initialLaunchWithSteam != queuedLaunchWithSteam;
 
         saveButton.setEnabled(dirty);
     }
@@ -180,6 +189,7 @@ public class SettingsDialog extends JDialog {
         Cogfly.settings.scrollingIncrement = queuedScrollIncrement;
         Cogfly.settings.useRelativeTime = queuedRelativeTime;
         Cogfly.settings.profileSpecificPaths = queuedPerProfilePaths;
+        Cogfly.settings.launchWithSteam = queuedLaunchWithSteam;
 
         if (!queuedProfileSources.equals(initialProfileSources))
             ProfileManager.loadProfiles();
@@ -200,7 +210,7 @@ public class SettingsDialog extends JDialog {
         queuedScrollIncrement = Cogfly.settings.scrollingIncrement;
         queuedRelativeTime = Cogfly.settings.useRelativeTime;
         queuedPerProfilePaths = Cogfly.settings.profileSpecificPaths;
-        initialProfileSources = new ArrayList<>(Cogfly.settings.profileSources);
+        queuedLaunchWithSteam = Cogfly.settings.launchWithSteam;initialProfileSources = new ArrayList<>(Cogfly.settings.profileSources);
         initialAutoNameSpacing = Cogfly.settings.modNameSpaces;
         initialBaseGameEnabled = Cogfly.settings.baseGameEnabled;
         initialSavePath = Cogfly.settings.profileSavePath;
@@ -209,5 +219,6 @@ public class SettingsDialog extends JDialog {
         initialScrollIncrement = Cogfly.settings.scrollingIncrement;
         initialRelativeTime = Cogfly.settings.useRelativeTime;
         initialPerProfilePaths = Cogfly.settings.profileSpecificPaths;
+        initialLaunchWithSteam = Cogfly.settings.launchWithSteam;
     }
 }
