@@ -61,7 +61,7 @@ public class FrameManager {
         }
         Border padding = BorderFactory.createEmptyBorder(0, 0, 5, 0);
         Border color =
-                new MatteBorder(0, 0, 5, 0, UIManager.getColor("Panel.background").darker()){
+                new MatteBorder(0, 0, 3, 0, UIManager.getColor("Panel.background").darker()){
                     @Override
                     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height){
                         color = UIManager.getColor("Panel.background").darker();
@@ -84,15 +84,6 @@ public class FrameManager {
         return currentPageButton;
     }
     public void setPage(CogflyPage page, SelectedPageButtonElement button){
-        // Button.selectedForeground
-        // Button.default.hoverBorderColor
-        // Button.default.focusColor
-        // Button.selectedBackground
-        // Button.highlight
-        // Button.borderColor
-        // Button.focus
-        // Button.hoverBorderColor
-        // Button.select
         if (page.equals(CogflyPage.SETTINGS)){
             JDialog dialog = new SettingsDialog(frame, "Settings", true);
             dialog.setVisible(true);

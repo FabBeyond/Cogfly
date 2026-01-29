@@ -154,7 +154,17 @@ public class ModPanelElement extends JPanel {
             installButton.setPreferredSize(new Dimension(100, installButton.getPreferredSize().height));
             installButton.setAlignmentY(Component.CENTER_ALIGNMENT);
 
+            boolean enabled = mod.isEnabled(profile);
+            JToggleButton enableButton = new JToggleButton(enabled ? "On" : "Off");
+            enableButton.setSelected(enabled);
+            enableButton.setEnabled(mod.isInstalled(profile));
+            enableButton.addActionListener(_ -> {
+                mod.setEnabled(profile, enableButton.isSelected());
+                enableButton.setText(enableButton.isSelected() ? "On" : "Off");
+            });
 
+            rowPanel.add(enableButton);
+            rowPanel.add(Box.createHorizontalGlue());
             rowPanel.add(toggleButton);
             rowPanel.add(Box.createHorizontalGlue());
             rowPanel.add(installButton);
@@ -212,6 +222,8 @@ public class ModPanelElement extends JPanel {
                 }
             });
             JButton openWebsite = new JButton("Open Project Website");
+            if (mod.getWebsiteUrl() != null)
+                openWebsite.setToolTipText(mod.getWebsiteUrl().toString());
             openWebsite.addActionListener(_ -> {
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
@@ -248,7 +260,7 @@ public class ModPanelElement extends JPanel {
 
             installButton.addActionListener(_ -> {
                 if (mod.isInstalled(profile) && !mod.isOutdated(profile)) Utils.removeMod(mod, profile);
-                else Utils.downloadMod(mod, profile);
+                else Utils.downloadMod(mod, profile, true);
                 filterButtons();
             });
 

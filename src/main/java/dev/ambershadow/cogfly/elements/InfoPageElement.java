@@ -18,44 +18,49 @@ public class InfoPageElement extends JPanel {
                 549, 336, Image.SCALE_SMOOTH);
         image.setIcon(new ImageIcon(scaled));
         image.setHorizontalAlignment(SwingConstants.CENTER);
-        add(image, BorderLayout.CENTER);
-        add(createButtons(), BorderLayout.SOUTH);
+        add(image, BorderLayout.NORTH);
+        add(createButtons(), BorderLayout.CENTER);
     }
 
     public JPanel createButtons(){
+        Dimension dim = new Dimension(175, 40);
+        Dimension max = new Dimension(Integer.MAX_VALUE, 40);
+
         JButton savesButton = new JButton("Open Saves Folder");
         savesButton.setIcon(Assets.openSaves.getAsIconWithColor(Color.RED));
         savesButton.setHorizontalAlignment(SwingConstants.LEFT);
+        savesButton.setPreferredSize(dim);
+        savesButton.setMaximumSize(max);
         savesButton.addActionListener(_ -> Utils.openSavePath());
 
         JButton logsButton = new JButton("Open Logs Folder");
         logsButton.setIcon(Assets.openSaves.getAsIconWithColor(Color.BLUE));
         logsButton.setHorizontalAlignment(SwingConstants.LEFT);
-        logsButton.setPreferredSize(savesButton.getPreferredSize());
+        logsButton.setPreferredSize(dim);
+        logsButton.setMaximumSize(max);
         logsButton.addActionListener(_ -> Utils.openPath(Paths.get(Cogfly.localDataPath).resolve("logs")));
 
         JButton launchVanilla = new JButton("Launch Vanilla Game");
         launchVanilla.setHorizontalAlignment(SwingConstants.CENTER);
-        launchVanilla.setPreferredSize(savesButton.getPreferredSize());
+        launchVanilla.setPreferredSize(dim);
+        launchVanilla.setMaximumSize(max);
         launchVanilla.addActionListener(_ -> Cogfly.launchGameAsync(false, "", Cogfly.settings.gamePath));
 
-        JPanel left = new JPanel();
-        left.setLayout(new BoxLayout(left, BoxLayout.X_AXIS));
-        left.add(Box.createHorizontalStrut(300));
-        left.add(savesButton);
-        JPanel right = new JPanel();
-        right.setLayout(new BoxLayout(right, BoxLayout.X_AXIS));
-        right.add(logsButton);
-        right.add(Box.createHorizontalStrut(300));
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
 
-        JPanel center = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        center.add(launchVanilla);
+        buttons.add(savesButton);
+        buttons.add(Box.createHorizontalGlue());
+        buttons.add(Box.createHorizontalStrut(20));
+        buttons.add(launchVanilla);
+        buttons.add(Box.createHorizontalStrut(20));
+        buttons.add(Box.createHorizontalGlue());
+        buttons.add(logsButton);
 
-        JPanel buttons = new JPanel(new BorderLayout());
-        buttons.add(left, BorderLayout.WEST);
-        buttons.add(center, BorderLayout.CENTER);
-        buttons.add(right, BorderLayout.EAST);
-        buttons.add(Box.createVerticalStrut(250), BorderLayout.SOUTH);
+        buttons.setBorder(
+                BorderFactory.createEmptyBorder(0, 300, 200, 300)
+        );
+
         return buttons;
     }
 }

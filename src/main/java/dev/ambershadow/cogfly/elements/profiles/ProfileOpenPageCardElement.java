@@ -110,11 +110,15 @@ public class ProfileOpenPageCardElement extends JPanel {
 
         remove = new JButton("Remove Profile");
         remove.addActionListener(_ -> {
-            ProfileManager.removeProfile(profile);
-            FrameManager.getOrCreate().setPage(
-                    FrameManager.CogflyPage.PROFILES,
-                    FrameManager.getOrCreate().profilesPageButton
-            );
+            int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete this profile?",
+                    "Confirm Profile Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (confirm == JOptionPane.YES_OPTION) {
+                ProfileManager.removeProfile(profile);
+                FrameManager.getOrCreate().setPage(
+                        FrameManager.CogflyPage.PROFILES,
+                        FrameManager.getOrCreate().profilesPageButton
+                );
+            }
         });
         if (profile.getPath().equals(Paths.get(Cogfly.settings.gamePath))){
             remove.setEnabled(false);

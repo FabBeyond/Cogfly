@@ -288,10 +288,13 @@ public class Utils {
         downloadMod(ModData.getMod(mod), profile, deps);
     }
 
-    public static void downloadMod(ModData mod, Profile profile){
-        downloadMod(ModData.getMod(mod), profile, true);
-    }
     public static void downloadMod(ModData mod, Profile profile, boolean deps){
+        downloadMod(mod, profile, deps, true);
+    }
+
+    public static void downloadMod(ModData mod, Profile profile, boolean deps, boolean enabled){
+        if (mod.isInstalled(profile) && profile.getInstalledVersion(mod).equals(mod.getVersionNumber()))
+            return;
         Cogfly.logger.info("Attempting to download {} at version {} for profile {}.", mod.getFullName(), mod.getVersionNumber(), profile.getName());
         profile.removeMod(mod);
         profile.getInstalledMods().add(mod);
@@ -300,8 +303,9 @@ public class Utils {
                 if (dep.contains("BepInExPack"))
                     continue;
                 ModData m = getModFromDependency(dep);
-                if (m != null && !m.isOutdated(profile))
-                    CompletableFuture.runAsync(() -> downloadMod(m, profile));
+                if (m != null && !m.isOutdated(profile)) {
+                    CompletableFuture.runAsync(() -> downloadMod(m, profile, true));
+                }
             }
         }
         Path bepinexRoot = profile.getBepInExPath();
@@ -357,13 +361,16 @@ public class Utils {
                 zis.closeEntry();
             }
         } catch (IOException ignored){}
+        mod.setEnabled(profile, enabled);
         ModPanelElement.redraw(profile);
     }
     private static ModData getModFromDependency(String dependency){
         for (ModData mod : Cogfly.mods) {
-            String combined = mod.getAuthor() + "-" + mod.getName();
-            if (dependency.contains(combined))
+            String[] split = dependency.split("-");
+            String dep = split[0] + "-" + split[1];
+            if (dep.equals(mod.getFullName()))
                 return mod;
+
         }
         return null;
     }

@@ -6,12 +6,17 @@ import com.google.gson.JsonObject;
 import dev.ambershadow.cogfly.Cogfly;
 import dev.ambershadow.cogfly.util.Profile;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class ModData {
 
@@ -48,6 +53,47 @@ public class ModData {
                         && mod.getAuthor().equals(other.getAuthor())
                         && mod.getDescription().equals(other.getDescription())
         ).findFirst().orElse(null);
+    }
+
+    private static boolean containsOldFile(Path directory) {
+        try (Stream<Path> files = Files.walk(directory)) {
+            return files
+                    .filter(Files::isRegularFile)
+                    .anyMatch(p -> p.getFileName().toString().endsWith(".old"));
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    private static void processDirectory(Path root, boolean enabled) {
+        try (Stream<Path> files = Files.walk(root)) {
+            files
+                    .filter(Files::isRegularFile)
+                    .filter(p -> !p.getFileName().toString().equals("manifest.json"))
+                    .forEach(p -> renameFile(p, enabled));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void renameFile(Path file, boolean enabled) {
+        String fileName = file.getFileName().toString();
+        try {
+            if (enabled) {
+                if (fileName.endsWith(".old")) {
+                    String newName = fileName.substring(0, fileName.length() - 4);
+                    Path target = file.resolveSibling(newName);
+                    Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } else {
+                if (!fileName.endsWith(".old")) {
+                    Path target = file.resolveSibling(fileName + ".old");
+                    Files.move(file, target, StandardCopyOption.REPLACE_EXISTING);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     static List<JsonObject> rawModData = new ArrayList<>();
     final JsonObject rawObj;
@@ -153,6 +199,31 @@ public class ModData {
                 .equals(profile.getInstalledVersion(this)));
     }
 
+    public boolean isEnabled(Profile profile) {
+        if (!isInstalled(profile))
+            return false;
+        try (Stream<Path> paths = Files.walk(profile.getBepInExPath())) {
+            return paths
+                    .filter(Files::isDirectory)
+                    .filter(p -> p.getFileName().toString().equals(getFullName()))
+                    .noneMatch(ModData::containsOldFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setEnabled(Profile profile, boolean enabled) {
+        if (enabled == isEnabled(profile))
+            return;
+        try (Stream<Path> paths = Files.walk(profile.getBepInExPath())) {
+            paths
+                    .filter(Files::isDirectory)
+                    .filter(p -> p.getFileName().toString().equals(getFullName()))
+                    .forEach(p -> processDirectory(p, enabled));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
     @Override
     public boolean equals(Object o){
         return o instanceof ModData md &&

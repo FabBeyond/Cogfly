@@ -254,7 +254,7 @@ public class ProfileManager {
                 if (d.isOutdated(profile)) {
                     outdatedMods.add(d);
                 }
-                Utils.downloadMod(d, profile, false);
+                Utils.downloadMod(d, profile, false, false);
             }
         });
 
@@ -325,7 +325,7 @@ public class ProfileManager {
             ver.put("major", Integer.parseInt(vf[0]));
             ver.put("minor", Integer.parseInt(vf[1]));
             ver.put("patch", Integer.parseInt(vf[2]));
-            mod.put("enabled", true);
+            mod.put("enabled", data.isEnabled(profile));
             mod.put("version", ver);
             mods.add(mod);
         }
