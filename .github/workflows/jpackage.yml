@@ -45,7 +45,7 @@ jobs:
         run: |
           jpackage \
               --input build/libs \
-              --main-jar cogfly-1.1.2.jar \
+              --main-jar Cogfly-1.1.2.jar \
               --name "Cogfly_intel" \
               --type dmg \
               --vendor "Ambershadow" \
@@ -58,7 +58,7 @@ jobs:
         run: |
           jpackage \
               --input build/libs \
-              --main-jar cogfly-1.1.2.jar \
+              --main-jar Cogfly-1.1.2.jar \
               --name "Cogfly_silicon" \
               --type dmg \
               --vendor "Ambershadow" \
@@ -71,7 +71,7 @@ jobs:
         run: |
           jpackage `
             --input build/libs `
-            --main-jar cogfly-1.1.2.jar `
+            --main-jar Cogfly-1.1.2.jar `
             --name Cogfly `
             --type msi `
             --vendor "Ambershadow" `
@@ -85,7 +85,7 @@ jobs:
         run: |
           jpackage `
             --input build/libs `
-            --main-jar cogfly-1.1.2.jar `
+            --main-jar Cogfly-1.1.2.jar `
             --name Cogfly `
             --type exe `
             --vendor "Ambershadow" `
@@ -100,7 +100,7 @@ jobs:
         run: |
           jpackage \
             --input build/libs \
-            --main-jar cogfly-1.1.2.jar \
+            --main-jar Cogfly-1.1.2.jar \
             --name Cogfly \
             --type deb \
             --vendor "Ambershadow" \
@@ -113,7 +113,7 @@ jobs:
         run: |
           jpackage \
             --input build/libs \
-            --main-jar cogfly-1.1.2.jar \
+            --main-jar Cogfly-1.1.2.jar \
             --name Cogfly \
             --type rpm \
             --vendor "Ambershadow" \
@@ -127,7 +127,7 @@ jobs:
           mkdir -p output/appimage
           jpackage \
             --input build/libs \
-            --main-jar cogfly-1.1.2.jar \
+            --main-jar Cogfly-1.1.2.jar \
             --name Cogfly-Linux_amd64 \
             --type app-image \
             --vendor "Ambershadow" \
