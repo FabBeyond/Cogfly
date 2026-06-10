@@ -24,6 +24,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -338,6 +339,32 @@ public class Cogfly {
     }
 
 
+    private static void showLaunchError(String details) {
+        String[] lines = details.split("\n");
+        Path logFile = Paths.get(localDataPath).resolve("logs/launch-error.log");
+        boolean truncated = lines.length > 20;
+        if (truncated) {
+            try {
+                Files.writeString(logFile, details);
+            } catch (IOException e) {
+                logger.error("Failed to write launch error log", e);
+            }
+        }
+        String message = truncated
+                ? "%s\n... (%d lines total)".formatted(String.join("\n", Arrays.copyOf(lines, 20)), lines.length)
+                : details;
+        SwingUtilities.invokeLater(() -> {
+            if (!truncated) {
+                JOptionPane.showMessageDialog(null, message, "Game Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int choice = JOptionPane.showOptionDialog(null, message, "Game Error",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null,
+                    new Object[]{"Open Log", "OK"}, "OK");
+            if (choice == 0) Utils.openPath(logFile.getParent());
+        });
+    }
+
     public static void launchGameAsync(boolean enabled, String path, String gamePath){
         CompletableFuture.runAsync(() -> {
             logger.info("Launching game. OS: {}, BepInExPath: {}, GamePath: {}", Utils.OperatingSystem.current(), path, gamePath);
@@ -408,10 +435,7 @@ public class Cogfly {
                     ).filter(Objects::nonNull).collect(Collectors.joining("\n"));
                     if (details.isBlank()) details = "Process exited with code " + exitCode;
                     logger.warn("Game process exited with code {}\n{}", exitCode, details);
-                    final String msg = details;
-                    SwingUtilities.invokeLater(() ->
-                        JOptionPane.showMessageDialog(null, msg, "Launch Error", JOptionPane.ERROR_MESSAGE)
-                    );
+                    showLaunchError(details);
                 }
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
@@ -421,7 +445,7 @@ public class Cogfly {
             SwingUtilities.invokeLater(() ->
                 JOptionPane.showMessageDialog(null,
                     "Failed to launch game: " + e.getCause().getMessage(),
-                    "Launch Error",
+                    "Game Error",
                     JOptionPane.ERROR_MESSAGE)
             );
             return null;
