@@ -26,8 +26,11 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Cogfly {
 
@@ -386,15 +389,28 @@ public class Cogfly {
                     }
             }*/
             try {
-                builder.redirectErrorStream(true);
                 Process process = builder.start();
-                String output = new String(process.getInputStream().readAllBytes());
+                CompletableFuture<String> stdoutFuture = CompletableFuture.supplyAsync(() -> {
+                    try { return new String(process.getInputStream().readAllBytes()); }
+                    catch (IOException e) { return ""; }
+                });
+                CompletableFuture<String> stderrFuture = CompletableFuture.supplyAsync(() -> {
+                    try { return new String(process.getErrorStream().readAllBytes()); }
+                    catch (IOException e) { return ""; }
+                });
                 int exitCode = process.waitFor();
+                String stdout = stdoutFuture.join();
+                String stderr = stderrFuture.join();
                 if (exitCode != 0) {
-                    logger.warn("Game process exited with code {}, output:\n{}", exitCode, output);
-                    String message = output.isBlank() ? "Process exited with code " + exitCode : output;
+                    String details = Stream.of(
+                            stdout.isBlank() ? null : "stdout: " + stdout.trim(),
+                            stderr.isBlank() ? null : "stderr: " + stderr.trim()
+                    ).filter(Objects::nonNull).collect(Collectors.joining("\n"));
+                    if (details.isBlank()) details = "Process exited with code " + exitCode;
+                    logger.warn("Game process exited with code {}\n{}", exitCode, details);
+                    final String msg = details;
                     SwingUtilities.invokeLater(() ->
-                        JOptionPane.showMessageDialog(null, message, "Launch Error", JOptionPane.ERROR_MESSAGE)
+                        JOptionPane.showMessageDialog(null, msg, "Launch Error", JOptionPane.ERROR_MESSAGE)
                     );
                 }
             } catch (IOException | InterruptedException e) {
