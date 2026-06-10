@@ -344,9 +344,9 @@ public class Cogfly {
             Path gameAppPath = game.resolve(Utils.getGameExecutable());
             if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.MAC)) {
                 builder.directory(game.toFile());
-                cmds.add("arch");
+                cmds.add("/usr/bin/arch");
                 cmds.add("-x86_64");
-                cmds.add("sh");
+                cmds.add("/bin/sh");
                 cmds.add(Utils.getGameExecutable());
             } else if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.LINUX)) {
                 builder.directory(game.toFile());
