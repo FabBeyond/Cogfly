@@ -337,7 +337,7 @@ public class Cogfly {
 
     public static void launchGameAsync(boolean enabled, String path, String gamePath){
         CompletableFuture.runAsync(() -> {
-            logger.info("Launching game. OS: {}, Path: {}", Utils.OperatingSystem.current(), path);
+            logger.info("Launching game. OS: {}, BepInExPath: {}, GamePath: {}", Utils.OperatingSystem.current(), path, gamePath);
             ProcessBuilder builder = new ProcessBuilder();
             List<String> cmds = new ArrayList<>();
             Path game = Paths.get(gamePath);
@@ -386,10 +386,29 @@ public class Cogfly {
                     }
             }*/
             try {
-                builder.start();
-            } catch (IOException e) {
+                builder.redirectErrorStream(true);
+                Process process = builder.start();
+                String output = new String(process.getInputStream().readAllBytes());
+                int exitCode = process.waitFor();
+                if (exitCode != 0) {
+                    logger.warn("Game process exited with code {}, output:\n{}", exitCode, output);
+                    String message = output.isBlank() ? "Process exited with code " + exitCode : output;
+                    SwingUtilities.invokeLater(() ->
+                        JOptionPane.showMessageDialog(null, message, "Launch Error", JOptionPane.ERROR_MESSAGE)
+                    );
+                }
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
+        }).exceptionally(e -> {
+            logger.error("Failed to launch game", e);
+            SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(null,
+                    "Failed to launch game: " + e.getCause().getMessage(),
+                    "Launch Error",
+                    JOptionPane.ERROR_MESSAGE)
+            );
+            return null;
         });
     }
 
