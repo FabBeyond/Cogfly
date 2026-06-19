@@ -24,10 +24,14 @@ import java.net.http.HttpResponse;
 import java.nio.file.*;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Cogfly {
 
@@ -335,18 +339,44 @@ public class Cogfly {
     }
 
 
+    private static void showLaunchError(String details) {
+        String[] lines = details.split("\n");
+        Path logFile = Paths.get(localDataPath).resolve("logs/launch-error.log");
+        boolean truncated = lines.length > 20;
+        if (truncated) {
+            try {
+                Files.writeString(logFile, details);
+            } catch (IOException e) {
+                logger.error("Failed to write launch error log", e);
+            }
+        }
+        String message = truncated
+                ? "%s\n... (%d lines total)".formatted(String.join("\n", Arrays.copyOf(lines, 20)), lines.length)
+                : details;
+        SwingUtilities.invokeLater(() -> {
+            if (!truncated) {
+                JOptionPane.showMessageDialog(null, message, "Game Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int choice = JOptionPane.showOptionDialog(null, message, "Game Error",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE, null,
+                    new Object[]{"Open Log", "OK"}, "OK");
+            if (choice == 0) Utils.openPath(logFile.getParent());
+        });
+    }
+
     public static void launchGameAsync(boolean enabled, String path, String gamePath){
         CompletableFuture.runAsync(() -> {
-            logger.info("Launching game. OS: {}, Path: {}", Utils.OperatingSystem.current(), path);
+            logger.info("Launching game. OS: {}, BepInExPath: {}, GamePath: {}", Utils.OperatingSystem.current(), path, gamePath);
             ProcessBuilder builder = new ProcessBuilder();
             List<String> cmds = new ArrayList<>();
             Path game = Paths.get(gamePath);
             Path gameAppPath = game.resolve(Utils.getGameExecutable());
             if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.MAC)) {
                 builder.directory(game.toFile());
-                cmds.add("arch");
+                cmds.add("/usr/bin/arch");
                 cmds.add("-x86_64");
-                cmds.add("sh");
+                cmds.add("/bin/sh");
                 cmds.add(Utils.getGameExecutable());
             } else if (Utils.OperatingSystem.current().equals(Utils.OperatingSystem.LINUX)) {
                 builder.directory(game.toFile());
@@ -386,10 +416,39 @@ public class Cogfly {
                     }
             }*/
             try {
-                builder.start();
-            } catch (IOException e) {
+                Process process = builder.start();
+                CompletableFuture<String> stdoutFuture = CompletableFuture.supplyAsync(() -> {
+                    try { return new String(process.getInputStream().readAllBytes()); }
+                    catch (IOException e) { return ""; }
+                });
+                CompletableFuture<String> stderrFuture = CompletableFuture.supplyAsync(() -> {
+                    try { return new String(process.getErrorStream().readAllBytes()); }
+                    catch (IOException e) { return ""; }
+                });
+                int exitCode = process.waitFor();
+                String stdout = stdoutFuture.join();
+                String stderr = stderrFuture.join();
+                if (exitCode != 0) {
+                    String details = Stream.of(
+                            stdout.isBlank() ? null : "stdout: " + stdout.trim(),
+                            stderr.isBlank() ? null : "stderr: " + stderr.trim()
+                    ).filter(Objects::nonNull).collect(Collectors.joining("\n"));
+                    if (details.isBlank()) details = "Process exited with code " + exitCode;
+                    logger.warn("Game process exited with code {}\n{}", exitCode, details);
+                    showLaunchError(details);
+                }
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
+        }).exceptionally(e -> {
+            logger.error("Failed to launch game", e);
+            SwingUtilities.invokeLater(() ->
+                JOptionPane.showMessageDialog(null,
+                    "Failed to launch game: " + e.getCause().getMessage(),
+                    "Game Error",
+                    JOptionPane.ERROR_MESSAGE)
+            );
+            return null;
         });
     }
 
